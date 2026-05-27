@@ -35,6 +35,7 @@ jobs:
           unzip -q /tmp/gradle-8.5-bin.zip -d /opt
           echo "GRADLE_HOME=/opt/gradle-8.5" >> $GITHUB_ENV
           echo "/opt/gradle-8.5/bin" >> $GITHUB_PATH
+          gradle --version
 
       - name: Install Android SDK
         run: |
@@ -53,16 +54,37 @@ jobs:
       - name: Install required SDK components
         run: |
           sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools" --sdk_root=$ANDROID_HOME
+          sdkmanager --list --sdk_root=$ANDROID_HOME
+
+      - name: Show environment info
+        run: |
+          echo "=== Environment Variables ==="
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "JAVA_HOME=$JAVA_HOME"
+          echo "GRADLE_HOME=$GRADLE_HOME"
+          echo ""
+          echo "=== Java Version ==="
+          java -version
+          echo ""
+          echo "=== Gradle Version ==="
+          gradle --version
+          echo ""
+          echo "=== ls -la ==="
+          ls -la
 
       - name: Build Debug APK
         run: |
-          gradle assembleDebug --no-daemon -x lint 2>&1
+          gradle assembleDebug --no-daemon -x lint 2>&1 | tee build.log
+          cat build.log | tail -50
 
       - name: List all build outputs
         if: success() || failure()
         run: |
           echo "=== Listing all files ==="
           find . -name "*.apk" -type f 2>/dev/null || echo "No APK files found"
+          echo ""
+          echo "=== Build directory ==="
+          ls -la app/build/ 2>/dev/null || echo "Build dir not found"
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
