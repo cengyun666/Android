@@ -35,7 +35,6 @@ jobs:
           unzip -q /tmp/gradle-8.5-bin.zip -d /opt
           echo "GRADLE_HOME=/opt/gradle-8.5" >> $GITHUB_ENV
           echo "/opt/gradle-8.5/bin" >> $GITHUB_PATH
-          gradle --version
 
       - name: Install Android SDK
         run: |
@@ -54,42 +53,32 @@ jobs:
       - name: Install required SDK components
         run: |
           sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools" --sdk_root=$ANDROID_HOME
-          sdkmanager --list --sdk_root=$ANDROID_HOME
 
-      - name: Show environment info
+      - name: Build Debug APK with full output
         run: |
-          echo "=== Environment Variables ==="
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          echo "JAVA_HOME=$JAVA_HOME"
-          echo "GRADLE_HOME=$GRADLE_HOME"
-          echo ""
-          echo "=== Java Version ==="
-          java -version
-          echo ""
-          echo "=== Gradle Version ==="
-          gradle --version
-          echo ""
-          echo "=== ls -la ==="
-          ls -la
+          gradle assembleDebug --no-daemon -x lint 2>&1
 
-      - name: Build Debug APK
+      - name: List ALL files recursively
         run: |
-          gradle assembleDebug --no-daemon -x lint 2>&1 | tee build.log
-          cat build.log | tail -50
-
-      - name: List all build outputs
-        if: success() || failure()
-        run: |
-          echo "=== Listing all files ==="
-          find . -name "*.apk" -type f 2>/dev/null || echo "No APK files found"
+          echo "=== ALL FILES ==="
+          find . -type f -name "*.apk" 2>/dev/null | head -20 || echo "No APK files found"
           echo ""
-          echo "=== Build directory ==="
-          ls -la app/build/ 2>/dev/null || echo "Build dir not found"
+          echo "=== APP DIRECTORY ==="
+          ls -la app/ 2>/dev/null || echo "app dir not found"
+          echo ""
+          echo "=== APP BUILD DIRECTORY ==="
+          ls -la app/build/ 2>/dev/null || echo "app/build dir not found"
+          echo ""
+          echo "=== APP BUILD OUTPUTS ==="
+          ls -la app/build/outputs/ 2>/dev/null || echo "outputs dir not found"
+          echo ""
+          echo "=== GRADLE BUILD OUTPUT ==="
+          ls -la build/ 2>/dev/null || echo "root build dir not found"
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk
           path: |
-            app/build/outputs/apk/**/*.apk
+            **/*.apk
           retention-days: 30
