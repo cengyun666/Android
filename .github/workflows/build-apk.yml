@@ -54,29 +54,32 @@ jobs:
         run: |
           sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools" --sdk_root=$ANDROID_HOME
 
-      - name: Clean build and rebuild
+      - name: Run assembleDebug with full output
         run: |
-          gradle clean assembleDebug --no-daemon -x lint 2>&1 | tail -200
+          echo "=== RUNNING GRADLE ASSEMBLEDEBUG ==="
+          gradle assembleDebug --no-daemon -x lint 2>&1
 
-      - name: Debug - List all files in detail
+      - name: Debug - Full directory listing
         run: |
-          echo "=== CURRENT DIRECTORY ==="
+          echo "=== FULL DEBUG INFORMATION ==="
+          echo ""
+          echo "1. Current directory:"
           pwd
           echo ""
-          echo "=== GRADLE BUILD OUTPUT ==="
-          ls -la build/ 2>/dev/null || echo "Root build dir not found"
+          echo "2. Root directory:"
+          ls -la
           echo ""
-          echo "=== APP BUILD OUTPUT ==="
-          ls -la app/build/ 2>/dev/null || echo "App build dir not found"
+          echo "3. Check if app/build exists:"
+          ls -la app/build/ 2>/dev/null || echo "app/build NOT FOUND"
           echo ""
-          echo "=== APP BUILD OUTPUTS ==="
-          ls -la app/build/outputs/ 2>/dev/null || echo "Outputs dir not found"
+          echo "4. List all files in app/build:"
+          find app/build -type f 2>/dev/null | head -50 || echo "No files in app/build"
           echo ""
-          echo "=== APK FILES ==="
-          find . -name "*.apk" -type f 2>/dev/null || echo "NO APK FILES FOUND"
+          echo "5. Search for APK files everywhere:"
+          find / -name "*.apk" -type f 2>/dev/null | head -20 || echo "NO APK FILES FOUND ANYWHERE"
           echo ""
-          echo "=== ALL FILES IN APP BUILD ==="
-          find app/build -type f 2>/dev/null | head -30
+          echo "6. Check gradle wrapper:"
+          ls -la gradlew* 2>/dev/null || echo "No gradle wrapper"
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
