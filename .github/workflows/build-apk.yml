@@ -54,27 +54,34 @@ jobs:
         run: |
           sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools" --sdk_root=$ANDROID_HOME
 
-      - name: Build Debug APK
+      - name: Build Debug APK with full verbose output
         run: |
-          gradle assembleDebug --no-daemon -x lint 2>&1 | tail -150
+          gradle assembleDebug --no-daemon -x lint --info 2>&1 | tail -200
 
-      - name: Find all APK files
+      - name: Check build directory contents
         run: |
-          echo "=== Searching for APK files ==="
-          find /home/runner -name "*.apk" -type f 2>/dev/null | head -20
+          echo "=== Current directory ==="
+          pwd
           echo ""
-          echo "=== Searching in workspace ==="
-          find /github/workspace -name "*.apk" -type f 2>/dev/null | head -20
+          echo "=== Root directory listing ==="
+          ls -la
           echo ""
-          echo "=== Searching in current dir ==="
-          find . -name "*.apk" -type f 2>/dev/null | head -20
+          echo "=== App directory listing ==="
+          ls -la app/
+          echo ""
+          echo "=== Searching for build directories ==="
+          find . -type d -name "build" 2>/dev/null
+          echo ""
+          echo "=== Searching for outputs directories ==="
+          find . -type d -name "outputs" 2>/dev/null
+          echo ""
+          echo "=== Searching for all files ==="
+          find . -type f -size +100k 2>/dev/null | head -20
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk
           path: |
-            /home/runner/**/*.apk
-            /github/workspace/**/*.apk
-            ./**/*.apk
+            **/*.apk
           retention-days: 30
