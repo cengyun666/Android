@@ -15,10 +15,6 @@ jobs:
   build:
     name: Build Debug APK
     runs-on: ubuntu-latest
-    env:
-      GRADLE_OPTS: "-Xmx4g -XX:+UseParallelGC"
-      JAVA_TOOL_OPTIONS: "-Xmx4g"
-      ANDROID_HOME: /opt/android-sdk
 
     steps:
       - name: Checkout code
@@ -37,25 +33,18 @@ jobs:
           echo "GRADLE_HOME=/opt/gradle-8.5" >> $GITHUB_ENV
           echo "/opt/gradle-8.5/bin" >> $GITHUB_PATH
 
-      - name: Install Android SDK
-        run: |
-          mkdir -p $ANDROID_HOME
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -P /tmp
-          unzip -q /tmp/commandlinetools-linux-11076708_latest.zip -d $ANDROID_HOME/cmdline-tools
-          mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
-          echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: 11076708
 
-      - name: Accept SDK licenses
-        run: yes | sdkmanager --licenses || true
-
-      - name: Install required SDK components
+      - name: Install SDK components
         run: |
-          sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools"
+          sdkmanager "platforms;android-34" "build-tools;34.0.0" --sdk_root=$ANDROID_HOME
 
       - name: Build Debug APK
-        run: gradle assembleDebug --no-daemon
+        run: |
+          gradle assembleDebug --no-daemon -x lint 2>&1 | tail -50
 
       - name: List build outputs
         run: find app/build -name "*.apk" -type f 2>/dev/null || echo "No APK files found"
