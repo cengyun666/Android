@@ -15,59 +15,29 @@ jobs:
   build:
     name: Build Debug APK
     runs-on: ubuntu-latest
-    env:
-      GRADLE_OPTS: "-Xmx6g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError"
+    container:
+      image: budtmo/docker-android:emulator_34
+      options: --user root
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Install Gradle 8.5
-        run: |
-          wget -q https://services.gradle.org/distributions/gradle-8.5-bin.zip -P /tmp
-          unzip -q /tmp/gradle-8.5-bin.zip -d /opt
-          echo "GRADLE_HOME=/opt/gradle-8.5" >> $GITHUB_ENV
-          echo "/opt/gradle-8.5/bin" >> $GITHUB_PATH
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          cmdline-tools-version: 11076708
-
-      - name: Install SDK components
-        run: |
-          sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools" --sdk_root=$ANDROID_HOME
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-
-      - name: Create Gradle wrapper
-        run: |
-          gradle wrapper --gradle-version 8.5 --distribution-type bin
-          ls -la gradlew*
-
       - name: Build Debug APK
         run: |
-          chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon -x lint 2>&1 | tail -100
+          cd /github/workspace
+          ./gradlew assembleDebug --no-daemon -x lint 2>&1
 
       - name: List all build outputs
         if: success() || failure()
         run: |
           echo "=== Listing all files in build directory ==="
-          find . -name "*.apk" -type f 2>/dev/null || echo "No APK files found"
-          echo ""
-          echo "=== Build directory structure ==="
-          ls -la app/build/ 2>/dev/null || echo "Build directory does not exist"
+          find /github/workspace -name "*.apk" -type f 2>/dev/null || echo "No APK files found"
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk
           path: |
-            app/build/outputs/apk/**/*.apk
+            /github/workspace/app/build/outputs/apk/**/*.apk
           retention-days: 30
