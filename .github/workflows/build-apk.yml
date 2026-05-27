@@ -29,15 +29,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Install Gradle 8.5
-        run: |
-          wget -q https://services.gradle.org/distributions/gradle-8.5-bin.zip -P /tmp
-          unzip -q /tmp/gradle-8.5-bin.zip -d /opt
-          echo "GRADLE_HOME=/opt/gradle-8.5" >> $GITHUB_ENV
-          echo "/opt/gradle-8.5/bin" >> $GITHUB_PATH
-          echo "=== GRADLE VERSION ==="
-          gradle --version
-
       - name: Install Android SDK
         run: |
           mkdir -p $ANDROID_HOME
@@ -54,49 +45,28 @@ jobs:
 
       - name: Install required SDK components
         run: |
-          echo "=== INSTALLING SDK COMPONENTS ==="
           sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools" --sdk_root=$ANDROID_HOME
 
-      - name: Show environment before build
+      - name: Generate Gradle wrapper
         run: |
-          echo "=== ENVIRONMENT VARIABLES ==="
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          echo "JAVA_HOME=$JAVA_HOME"
-          echo "GRADLE_HOME=$GRADLE_HOME"
-          echo ""
-          echo "=== PATH ==="
-          echo $PATH
-          echo ""
-          echo "=== ANDROID SDK BUILD-TOOLS ==="
-          ls $ANDROID_HOME/build-tools/ 2>/dev/null || echo "No build-tools found"
+          wget -q https://services.gradle.org/distributions/gradle-8.5-bin.zip -P /tmp
+          unzip -q /tmp/gradle-8.5-bin.zip -d /tmp
+          /tmp/gradle-8.5/bin/gradle wrapper --gradle-version 8.5 --distribution-type bin
+          chmod +x gradlew
 
-      - name: Build with error capture
-        id: build_step
-        continue-on-error: true
+      - name: Build using gradlew
         run: |
-          echo "=== STARTING BUILD ==="
-          gradle assembleDebug --no-daemon -x lint 2>&1 | tee /tmp/build.log
-          exit ${PIPESTATUS[0]}
+          ./gradlew assembleDebug --no-daemon -x lint 2>&1
 
-      - name: Show full build log on failure
-        if: failure()
+      - name: List all APK files
         run: |
-          echo "=== FULL BUILD LOG (LAST 200 LINES) ==="
-          tail -200 /tmp/build.log
-
-      - name: Debug info regardless of outcome
-        run: |
-          echo "=== DEBUG INFORMATION ==="
-          echo "Current directory: $(pwd)"
-          echo ""
-          echo "=== Files in app/build ==="
-          find app/build -type f 2>/dev/null | head -30 || echo "No files in app/build"
-          echo ""
-          echo "=== APK files found ==="
+          echo "=== APK FILES ==="
           find . -name "*.apk" -type f 2>/dev/null || echo "NO APK FILES"
+          echo ""
+          echo "=== APP BUILD OUTPUTS ==="
+          ls -la app/build/outputs/ 2>/dev/null || echo "No outputs"
 
       - name: Upload Debug APK
-        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk
