@@ -32,6 +32,15 @@ jobs:
           unzip -q /tmp/gradle-8.5-bin.zip -d /opt
           echo "GRADLE_HOME=/opt/gradle-8.5" >> $GITHUB_ENV
           echo "/opt/gradle-8.5/bin" >> $GITHUB_PATH
+          gradle --version
+
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: 34
+          build-tools: 34.0.0
+          ndk: 25.2.9519653
+          cmake: 3.22.1
 
       - name: Build Debug APK
         run: gradle assembleDebug --stacktrace
