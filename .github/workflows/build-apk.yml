@@ -35,6 +35,8 @@ jobs:
           unzip -q /tmp/gradle-8.5-bin.zip -d /opt
           echo "GRADLE_HOME=/opt/gradle-8.5" >> $GITHUB_ENV
           echo "/opt/gradle-8.5/bin" >> $GITHUB_PATH
+          echo "=== GRADLE VERSION ==="
+          gradle --version
 
       - name: Install Android SDK
         run: |
@@ -52,36 +54,49 @@ jobs:
 
       - name: Install required SDK components
         run: |
+          echo "=== INSTALLING SDK COMPONENTS ==="
           sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools" --sdk_root=$ANDROID_HOME
 
-      - name: Run assembleDebug with full output
+      - name: Show environment before build
         run: |
-          echo "=== RUNNING GRADLE ASSEMBLEDEBUG ==="
-          gradle assembleDebug --no-daemon -x lint 2>&1
+          echo "=== ENVIRONMENT VARIABLES ==="
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "JAVA_HOME=$JAVA_HOME"
+          echo "GRADLE_HOME=$GRADLE_HOME"
+          echo ""
+          echo "=== PATH ==="
+          echo $PATH
+          echo ""
+          echo "=== ANDROID SDK BUILD-TOOLS ==="
+          ls $ANDROID_HOME/build-tools/ 2>/dev/null || echo "No build-tools found"
 
-      - name: Debug - Full directory listing
+      - name: Build with error capture
+        id: build_step
+        continue-on-error: true
         run: |
-          echo "=== FULL DEBUG INFORMATION ==="
+          echo "=== STARTING BUILD ==="
+          gradle assembleDebug --no-daemon -x lint 2>&1 | tee /tmp/build.log
+          exit ${PIPESTATUS[0]}
+
+      - name: Show full build log on failure
+        if: failure()
+        run: |
+          echo "=== FULL BUILD LOG (LAST 200 LINES) ==="
+          tail -200 /tmp/build.log
+
+      - name: Debug info regardless of outcome
+        run: |
+          echo "=== DEBUG INFORMATION ==="
+          echo "Current directory: $(pwd)"
           echo ""
-          echo "1. Current directory:"
-          pwd
+          echo "=== Files in app/build ==="
+          find app/build -type f 2>/dev/null | head -30 || echo "No files in app/build"
           echo ""
-          echo "2. Root directory:"
-          ls -la
-          echo ""
-          echo "3. Check if app/build exists:"
-          ls -la app/build/ 2>/dev/null || echo "app/build NOT FOUND"
-          echo ""
-          echo "4. List all files in app/build:"
-          find app/build -type f 2>/dev/null | head -50 || echo "No files in app/build"
-          echo ""
-          echo "5. Search for APK files everywhere:"
-          find / -name "*.apk" -type f 2>/dev/null | head -20 || echo "NO APK FILES FOUND ANYWHERE"
-          echo ""
-          echo "6. Check gradle wrapper:"
-          ls -la gradlew* 2>/dev/null || echo "No gradle wrapper"
+          echo "=== APK files found ==="
+          find . -name "*.apk" -type f 2>/dev/null || echo "NO APK FILES"
 
       - name: Upload Debug APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk
