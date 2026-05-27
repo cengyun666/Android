@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">个人记账</string>
+    <string name="tab_home">首页</string>
+    <string name="tab_transactions">账单</string>
+    <string name="tab_statistics">统计</string>
+    <string name="tab_budget">预算</string>
+    <string name="tab_accounts">账户</string>
+    <string name="tab_settings">设置</string>
+</resources>
