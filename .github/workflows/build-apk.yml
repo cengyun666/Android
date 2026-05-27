@@ -15,6 +15,8 @@ jobs:
   build:
     name: Build Debug APK
     runs-on: ubuntu-latest
+    env:
+      GRADLE_OPTS: "-Xmx6g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError"
 
     steps:
       - name: Checkout code
@@ -40,18 +42,21 @@ jobs:
 
       - name: Install SDK components
         run: |
-          sdkmanager "platforms;android-34" "build-tools;34.0.0" --sdk_root=$ANDROID_HOME
+          sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools" --sdk_root=$ANDROID_HOME
           echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
 
       - name: Create Gradle wrapper
         run: |
           gradle wrapper --gradle-version 8.5 --distribution-type bin
+          ls -la gradlew*
 
       - name: Build Debug APK
         run: |
-          ./gradlew assembleDebug --no-daemon -x lint 2>&1
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon -x lint 2>&1 | tail -100
 
       - name: List all build outputs
+        if: success() || failure()
         run: |
           echo "=== Listing all files in build directory ==="
           find . -name "*.apk" -type f 2>/dev/null || echo "No APK files found"
@@ -65,5 +70,4 @@ jobs:
           name: debug-apk
           path: |
             app/build/outputs/apk/**/*.apk
-            **/*.apk
           retention-days: 30
