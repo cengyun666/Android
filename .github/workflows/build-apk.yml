@@ -35,6 +35,7 @@ jobs:
           unzip -q /tmp/gradle-8.5-bin.zip -d /opt
           echo "GRADLE_HOME=/opt/gradle-8.5" >> $GITHUB_ENV
           echo "/opt/gradle-8.5/bin" >> $GITHUB_PATH
+          gradle --version
 
       - name: Install Android SDK
         run: |
@@ -54,28 +55,40 @@ jobs:
         run: |
           sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools" --sdk_root=$ANDROID_HOME
 
-      - name: Build Debug APK with full output
+      - name: Check project structure
         run: |
-          gradle assembleDebug --no-daemon -x lint 2>&1
+          echo "=== Project Structure ==="
+          ls -la
+          echo ""
+          echo "=== Settings ==="
+          cat settings.gradle.kts
+          echo ""
+          echo "=== Root build.gradle ==="
+          cat build.gradle.kts
+
+      - name: Build Debug APK with error capture
+        id: build
+        continue-on-error: true
+        run: |
+          gradle assembleDebug --no-daemon -x lint 2>&1 | tee build.log
+          exit_code=${PIPESTATUS[0]}
+          echo "BUILD_EXIT_CODE=$exit_code" >> $GITHUB_ENV
+          exit $exit_code
+
+      - name: Show build error log
+        if: failure()
+        run: |
+          echo "=== LAST 100 LINES OF BUILD LOG ==="
+          tail -100 build.log
 
       - name: List ALL files recursively
+        if: success() || failure()
         run: |
           echo "=== ALL FILES ==="
           find . -type f -name "*.apk" 2>/dev/null | head -20 || echo "No APK files found"
-          echo ""
-          echo "=== APP DIRECTORY ==="
-          ls -la app/ 2>/dev/null || echo "app dir not found"
-          echo ""
-          echo "=== APP BUILD DIRECTORY ==="
-          ls -la app/build/ 2>/dev/null || echo "app/build dir not found"
-          echo ""
-          echo "=== APP BUILD OUTPUTS ==="
-          ls -la app/build/outputs/ 2>/dev/null || echo "outputs dir not found"
-          echo ""
-          echo "=== GRADLE BUILD OUTPUT ==="
-          ls -la build/ 2>/dev/null || echo "root build dir not found"
 
       - name: Upload Debug APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk
