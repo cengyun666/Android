@@ -35,7 +35,6 @@ jobs:
           unzip -q /tmp/gradle-8.5-bin.zip -d /opt
           echo "GRADLE_HOME=/opt/gradle-8.5" >> $GITHUB_ENV
           echo "/opt/gradle-8.5/bin" >> $GITHUB_PATH
-          gradle --version
 
       - name: Install Android SDK
         run: |
@@ -55,43 +54,27 @@ jobs:
         run: |
           sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools" --sdk_root=$ANDROID_HOME
 
-      - name: Check project structure
+      - name: Build Debug APK
         run: |
-          echo "=== Project Structure ==="
-          ls -la
+          gradle assembleDebug --no-daemon -x lint 2>&1 | tail -150
+
+      - name: Find all APK files
+        run: |
+          echo "=== Searching for APK files ==="
+          find /home/runner -name "*.apk" -type f 2>/dev/null | head -20
           echo ""
-          echo "=== Settings ==="
-          cat settings.gradle.kts
+          echo "=== Searching in workspace ==="
+          find /github/workspace -name "*.apk" -type f 2>/dev/null | head -20
           echo ""
-          echo "=== Root build.gradle ==="
-          cat build.gradle.kts
-
-      - name: Build Debug APK with error capture
-        id: build
-        continue-on-error: true
-        run: |
-          gradle assembleDebug --no-daemon -x lint 2>&1 | tee build.log
-          exit_code=${PIPESTATUS[0]}
-          echo "BUILD_EXIT_CODE=$exit_code" >> $GITHUB_ENV
-          exit $exit_code
-
-      - name: Show build error log
-        if: failure()
-        run: |
-          echo "=== LAST 100 LINES OF BUILD LOG ==="
-          tail -100 build.log
-
-      - name: List ALL files recursively
-        if: success() || failure()
-        run: |
-          echo "=== ALL FILES ==="
-          find . -type f -name "*.apk" 2>/dev/null | head -20 || echo "No APK files found"
+          echo "=== Searching in current dir ==="
+          find . -name "*.apk" -type f 2>/dev/null | head -20
 
       - name: Upload Debug APK
-        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk
           path: |
-            **/*.apk
+            /home/runner/**/*.apk
+            /github/workspace/**/*.apk
+            ./**/*.apk
           retention-days: 30
