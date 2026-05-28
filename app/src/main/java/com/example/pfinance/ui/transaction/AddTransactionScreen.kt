@@ -20,6 +20,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.pfinance.domain.model.*
 import com.example.pfinance.ui.components.*
+import com.example.pfinance.ui.theme.ExpenseRed
+import com.example.pfinance.ui.theme.IncomeGreen
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -259,6 +261,7 @@ fun CategoryChip(category: Category, selected: Boolean, onClick: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountSelector(accounts: List<Account>, selectedAccountId: Long?, onSelect: (Long) -> Unit) {
     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

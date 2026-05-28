@@ -59,7 +59,7 @@ fun CategoryRow(category: Category) {
             verticalAlignment = Alignment.CenterVertically) {
             CategoryIcon(icon = category.icon, color = category.color, size = 36)
             Spacer(Modifier.width(12.dp))
-            Text(category.name, style = MaterialTheme.typography.bodyLarge, Modifier.weight(1f))
+            Text(category.name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
             if (category.isSystem) {
                 Text("系统", style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)

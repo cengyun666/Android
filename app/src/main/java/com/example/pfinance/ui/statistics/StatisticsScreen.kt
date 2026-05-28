@@ -17,6 +17,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.pfinance.domain.model.*
 import com.example.pfinance.ui.components.*
+import com.example.pfinance.ui.theme.ExpenseRed
+import com.example.pfinance.ui.theme.IncomeGreen
 import java.text.DecimalFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,8 +63,10 @@ fun StatisticsScreen(
                         Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                     ) {
-                        Row(Modifier.padding(20.dp), horizontalArrangement = Arrangement.SpaceEvenly,
-                            modifier = Modifier.fillMaxWidth()) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(20.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
                             SummaryItem("支出", state.totalExpense, ExpenseRed)
                             SummaryItem("收入", state.totalIncome, IncomeGreen)
                             SummaryItem("结余", state.totalIncome - state.totalExpense,
@@ -164,7 +168,7 @@ fun CategoryBarItem(summary: CategorySummary) {
         }
         Spacer(Modifier.height(4.dp))
         LinearProgressIndicator(
-            progress = { maxWidth },
+            progress = maxWidth,
             modifier = Modifier.fillMaxWidth().height(6.dp),
             color = Color(summary.categoryColor),
             trackColor = MaterialTheme.colorScheme.surfaceVariant
@@ -188,14 +192,14 @@ fun MonthlyTrendItem(summary: MonthlySummary) {
         Spacer(Modifier.height(4.dp))
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             LinearProgressIndicator(
-                progress = { (summary.income / maxAmount).toFloat() },
+                progress = (summary.income / maxAmount).toFloat(),
                 modifier = Modifier.weight(1f).height(4.dp),
                 color = IncomeGreen,
                 trackColor = MaterialTheme.colorScheme.surfaceVariant
             )
             Spacer(Modifier.width(4.dp))
             LinearProgressIndicator(
-                progress = { (summary.expense / maxAmount).toFloat() },
+                progress = (summary.expense / maxAmount).toFloat(),
                 modifier = Modifier.weight(1f).height(4.dp),
                 color = ExpenseRed,
                 trackColor = MaterialTheme.colorScheme.surfaceVariant

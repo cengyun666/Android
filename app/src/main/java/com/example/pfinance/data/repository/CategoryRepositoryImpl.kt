@@ -6,6 +6,7 @@ import com.example.pfinance.domain.model.Category
 import com.example.pfinance.domain.model.CategoryType
 import com.example.pfinance.domain.repository.CategoryRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton

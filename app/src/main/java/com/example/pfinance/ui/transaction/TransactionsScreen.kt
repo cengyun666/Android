@@ -18,6 +18,8 @@ import com.example.pfinance.domain.model.TransactionType
 import com.example.pfinance.ui.components.*
 import com.example.pfinance.ui.home.TransactionItem
 import com.example.pfinance.ui.navigation.Screen
+import com.example.pfinance.ui.theme.ExpenseRed
+import com.example.pfinance.ui.theme.IncomeGreen
 import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,9 +77,8 @@ fun TransactionsScreen(
                 color = MaterialTheme.colorScheme.surfaceVariant
             ) {
                 Row(
-                    Modifier.padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("支出", style = MaterialTheme.typography.labelSmall)

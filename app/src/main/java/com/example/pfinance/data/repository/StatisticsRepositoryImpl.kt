@@ -58,7 +58,7 @@ class StatisticsRepositoryImpl @Inject constructor(
             (1..12).map { month ->
                 val monthTransactions = transactions.filter { it.date.monthValue == month }
                 MonthlySummary(
-                    month = "$month月",
+                    month = "${month}月",
                     income = monthTransactions.filter { it.type == "INCOME" }.sumOf { it.amount },
                     expense = monthTransactions.filter { it.type == "EXPENSE" }.sumOf { it.amount }
                 )

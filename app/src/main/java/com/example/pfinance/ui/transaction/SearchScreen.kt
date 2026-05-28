@@ -78,6 +78,7 @@ fun SearchScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionSearchItem(transaction: Transaction, onClick: () -> Unit) {
     Card(

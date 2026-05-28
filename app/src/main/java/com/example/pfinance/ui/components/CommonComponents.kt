@@ -155,7 +155,7 @@ fun ProgressBar(
     trackColor: Color = MaterialTheme.colorScheme.surfaceVariant
 ) {
     LinearProgressIndicator(
-        progress = { progress.coerceIn(0f, 1f) },
+        progress = progress.coerceIn(0f, 1f),
         modifier = modifier.fillMaxWidth().height(8.dp),
         color = if (progress > 1f) MaterialTheme.colorScheme.error else color,
         trackColor = trackColor
@@ -194,6 +194,25 @@ fun formatDateTime(dateTime: LocalDateTime): String {
         else -> DateTimeFormatter.ofPattern("yyyy年MM月dd日")
     }
     return dateTime.format(formatter)
+}
+
+@Composable
+fun DetailRow(label: String, value: String, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            value,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
 }
 
 fun formatCurrency(amount: Double): String {

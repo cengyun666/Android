@@ -30,7 +30,7 @@ fun ReimbursementsScreen(navController: NavHostController) {
             EmptyState(
                 icon = Icons.Default.ReceiptLong,
                 title = "暂无待报销记录",
-                subtitle = "记账时标记"可报销"即可在此追踪报销状态"
+                subtitle = "记账时标记「可报销」即可在此追踪报销状态"
             )
         }
     }

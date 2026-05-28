@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -19,6 +20,9 @@ import androidx.navigation.NavHostController
 import com.example.pfinance.domain.model.*
 import com.example.pfinance.ui.components.*
 import com.example.pfinance.ui.navigation.Screen
+import com.example.pfinance.ui.theme.ExpenseRed
+import com.example.pfinance.ui.theme.IncomeGreen
+import com.example.pfinance.ui.theme.TransferBlue
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)

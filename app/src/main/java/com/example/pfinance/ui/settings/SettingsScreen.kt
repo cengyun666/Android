@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.pfinance.ui.components.SectionHeader
 import com.example.pfinance.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -98,5 +99,5 @@ fun SettingsMenuItem(icon: ImageVector, title: String, onClick: () -> Unit) {
                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
         }
     }
-    HorizontalDivider(modifier = Modifier.padding(start = 54.dp))
+    Divider(modifier = Modifier.padding(start = 54.dp))
 }

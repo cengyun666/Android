@@ -2,12 +2,14 @@ package com.example.pfinance.ui.account
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -57,7 +59,7 @@ fun AddAccountScreen(navController: NavHostController, accountId: Long = -1, vie
             // Account type selector
             Text("账户类型", style = MaterialTheme.typography.labelLarge)
             LazyVerticalGrid(
-                columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(3),
+                columns = GridCells.Fixed(3),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -78,7 +80,6 @@ fun AddAccountScreen(navController: NavHostController, accountId: Long = -1, vie
                     )
                 }
             }
-            ("")
 
             OutlinedTextField(
                 value = state.balance,
@@ -130,19 +131,3 @@ fun AddAccountScreen(navController: NavHostController, accountId: Long = -1, vie
     }
 }
 
-@Composable
-private fun LazyVerticalGrid(
-    columns: androidx.compose.foundation.lazy.grid.GridCells,
-    modifier: Modifier = Modifier,
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
-    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-    content: @Composable androidx.compose.foundation.lazy.grid.LazyGridScope.() -> Unit
-) {
-    androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
-        columns = columns,
-        modifier = modifier,
-        horizontalArrangement = horizontalArrangement,
-        verticalArrangement = verticalArrangement,
-        content = content
-    )
-}

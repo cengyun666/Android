@@ -17,6 +17,8 @@ import androidx.navigation.NavHostController
 import com.example.pfinance.domain.model.Budget
 import com.example.pfinance.ui.components.*
 import com.example.pfinance.ui.navigation.Screen
+import com.example.pfinance.ui.theme.ExpenseRed
+import com.example.pfinance.ui.theme.IncomeGreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
