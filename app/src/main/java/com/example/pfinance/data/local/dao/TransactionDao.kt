@@ -79,7 +79,11 @@ interface TransactionDao {
     @Query("SELECT SUM(amount) FROM transactions WHERE isDeleted = 0 AND type = :type AND accountId = :accountId")
     suspend fun getTotalByTypeAndAccount(type: String, accountId: Long): Double?
 
-    @Search
+    @Query("""
+        SELECT * FROM transactions
+        WHERE isDeleted = 0 AND (note LIKE :query OR merchantName LIKE :query)
+        ORDER BY date DESC
+    """)
     suspend fun searchTransactions(query: String): List<TransactionEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
